@@ -84,15 +84,21 @@ const HomeScreen: React.FC = () => {
   return (
     <View className="flex-1 bg-white">
       <StatusBar style="dark" />
+      <View className='flex-row justify-between items-center p-4 bg-gray-100'>
+      <Text className="text-2xl font-bold text-gray-800">
+            Top Tracks in Colombia
+          </Text>
+          <TouchableOpacity
+            className='bg-blue-500 px-4 py-2 rounded-full'
+            onPress={() => navigation.navigate("Profile")}
+          >
+            <Text className='text-white font-semibold'>Profile</Text>
+          </TouchableOpacity>
+      </View>
       <FlatList
         data={topTracks}
         renderItem={renderTrackItem}
-        keyExtractor={(item) => item.mbid || item.name}
-        ListHeaderComponent={
-          <Text className="text-2xl font-bold text-gray-800 p-4">
-            Top Tracks in Colombia
-          </Text>
-        }
+        keyExtractor={(item) => item.mbid || item.name}        
       />
     </View>
   );
