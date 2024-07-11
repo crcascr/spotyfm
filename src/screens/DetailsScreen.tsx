@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { getArtistInfo } from "../services/lastfm";
+import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
+import { capitalizeFirstLetter } from "../utils/helpers";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
 
@@ -17,7 +27,7 @@ type Props = {
   navigation: DetailsScreenNavigationProp;
 };
 
-const DetailsScreen: React.FC<Props> = ({ route }) => {
+const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [artistInfo, setArtistInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +49,7 @@ const DetailsScreen: React.FC<Props> = ({ route }) => {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#1DB954" />
       </View>
     );
   }
@@ -47,7 +57,7 @@ const DetailsScreen: React.FC<Props> = ({ route }) => {
   if (!artistInfo) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-lg text-red-500">
+        <Text className="text-lg text-white">
           Failed to load artist information
         </Text>
       </View>
@@ -55,36 +65,80 @@ const DetailsScreen: React.FC<Props> = ({ route }) => {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white p-4">
-      <Text className="text-3xl font-bold mb-4">{artistInfo.name}</Text>
+    <ScrollView className="flex-1 bg-black">
+      <StatusBar style="dark" />
+      <LinearGradient colors={["#1DB954", "#191414"]} className="p-4 pt-12">
+        <Image
+          source={{
+            uri:
+              artistInfo.image[3]["#text"] || "https://via.placeholder.com/300",
+          }}
+          className="w-48 h-48 rounded-full self-center mb-4"
+        />
+        <Text className="text-3xl font-bold text-white text-center mb-2">
+          {artistInfo.name}
+        </Text>
+        <Text className="text-sm text-gray-300 text-center mb-4">
+          {Number(artistInfo.stats.listeners).toLocaleString()} monthly
+          listeners
+        </Text>
+        <View className="flex-row justify-center mb-4">
+          <TouchableOpacity className="bg-[#1DB954] px-6 py-2 rounded-full mr-2">
+            <Text className="text-white font-semibold">Follow</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="border border-white px-6 py-2 rounded-full">
+            <Text className="text-white">Share</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-      <Text className="text-xl font-semibold mb-2">About</Text>
-      <Text className="mb-4">{artistInfo.bio.summary}</Text>
+      <View className="p-4">
+        <Text className="text-xl font-semibold text-white mb-2">About</Text>
+        <Text className="text-gray-300 mb-4">{artistInfo.bio.summary}</Text>
 
-      <Text className="text-xl font-semibold mb-2">Tags</Text>
-      <View className="flex-row flex-wrap mb-4">
-        {artistInfo.tags.tag.map((tag: { name: string }, index: number) => (
-          <Text
-            key={index}
-            className="mr-2 mb-2 px-2 py-1 bg-gray-200 rounded-full"
-          >
-            {tag.name}
-          </Text>
-        ))}
+        <Text className="text-xl font-semibold text-white mb-2">Tags</Text>
+        <View className="flex-row flex-wrap mb-4">
+          {artistInfo.tags.tag.map((tag: { name: string }, index: number) => (
+            <Text
+              key={index}
+              className="mr-2 mb-2 px-3 py-1 bg-gray-800 rounded-full text-gray-300"
+            >
+              {capitalizeFirstLetter(tag.name)}
+            </Text>
+          ))}
+        </View>
+
+        <Text className="text-xl font-semibold text-white mb-2">
+          Similar Artist
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-4"
+        >
+          {artistInfo.similar.artist.map((similarArtist, index) => (
+            <TouchableOpacity
+              key={index}
+              className="mr-4 items-center"
+              onPress={() =>
+                navigation.push("Details", { artist: similarArtist.name })
+              }
+            >
+              <Image
+                source={{
+                  uri:
+                    similarArtist.image[2]["#text"] ||
+                    "https://via.placeholder.com/100",
+                }}
+                className="w-24 h-24 rounded-full mb-2"
+              />
+              <Text className="text-gray-300 text-center w-24">
+                {similarArtist.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
-
-      <Text className="text-xl font-semibold mb-2">Stats</Text>
-      <Text className="mb-1">Listeners: {artistInfo.stats.listeners}</Text>
-      <Text className="mb-4">Playcount: {artistInfo.stats.playcount}</Text>
-
-      <Text className="text-xl font-semibold mb-2">Similar Artist</Text>
-      {artistInfo.similar.artist.map(
-        (similarArtisit: { name: string }, index: number) => (
-          <Text key={index} className="mb-1">
-            {similarArtisit.name}
-          </Text>
-        )
-      )}
     </ScrollView>
   );
 };

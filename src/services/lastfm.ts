@@ -41,6 +41,10 @@ export const getTopTracks = async (country: string): Promise<Track[]> => {
 
 interface ArtistInfo {
   name: string;
+  image: Array<{
+    "#text": string;
+    size: string;
+  }>;
   bio: {
     summary: string;
     content: string;
@@ -53,7 +57,10 @@ interface ArtistInfo {
     playcount: string;
   };
   similar: {
-    artist: Array<{ name: string }>;
+    artist: Array<{
+      name: string;
+      image: Array<{ "#text": string; size: string }>;
+    }>;
   };
 }
 
