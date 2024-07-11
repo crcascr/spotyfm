@@ -12,7 +12,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { getArtistInfo } from "../services/lastfm";
 import { LinearGradient } from "expo-linear-gradient";
-import { StatusBar } from "expo-status-bar";
 import { capitalizeFirstLetter } from "../utils/helpers";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
@@ -66,8 +65,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <ScrollView className="flex-1 bg-black">
-      <StatusBar style="dark" />
-      <LinearGradient colors={["#1DB954", "#191414"]} className="p-4 pt-12">
+      <LinearGradient colors={["#1ed760", "#000000"]} className="p-4 pt-14">
         <Image
           source={{
             uri:
@@ -83,7 +81,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           listeners
         </Text>
         <View className="flex-row justify-center mb-4">
-          <TouchableOpacity className="bg-[#1DB954] px-6 py-2 rounded-full mr-2">
+          <TouchableOpacity className="bg-[#1ed760] px-6 py-2 rounded-full mr-2">
             <Text className="text-white font-semibold">Follow</Text>
           </TouchableOpacity>
           <TouchableOpacity className="border border-white px-6 py-2 rounded-full">

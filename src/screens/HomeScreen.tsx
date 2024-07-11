@@ -3,9 +3,9 @@ import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { getTopTracks } from "../services/lastfm";
-import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 
 type RootStackParamList = {
   Home: undefined;
@@ -103,26 +103,27 @@ const HomeScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-black">
-        <Text className="text-lg text-gray-300">Loading...</Text>
-      </View>
+        <View className="flex-1 pt-14 justify-center items-center bg-black">
+          <Text className="text-lg text-gray-300">Loading...</Text>
+        </View>
     );
   }
 
   return (
     <View className="flex-1 bg-black">
-      <StatusBar style="light" />
-      <View className="flex-row justify-between items-center p-4 bg-gray-900">
-        <Text className="text-2xl font-bold text-white">
-          Top Tracks in Colombia
-        </Text>
-        <TouchableOpacity
-          className="bg-green-500 p-2 rounded-full"
-          onPress={() => navigation.navigate("Profile")}
-        >
-          <Ionicons name="person" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+      <LinearGradient colors={["#1ED760", "#000000"]}>
+        <View className="flex-row items-center px-4 py-14">
+          <TouchableOpacity
+            className="bg-[#1ed760] p-2 rounded-full"
+            onPress={() => navigation.navigate("Profile")}
+          >
+            <Ionicons name="person" size={24} color="white" />
+          </TouchableOpacity>
+          <Text className="text-2xl ml-4 font-bold text-white">
+            Top Tracks in Colombia
+          </Text>
+        </View>
+      </LinearGradient>
       <FlatList
         data={topTracks}
         renderItem={renderTrackItem}
@@ -147,7 +148,7 @@ const HomeScreen: React.FC = () => {
             </Text>
           </View>
           <TouchableOpacity className="ml-4">
-            <Ionicons name="pause" size={24} color="white"  />
+            <Ionicons name="pause" size={24} color="white" />
           </TouchableOpacity>
         </View>
       )}

@@ -55,9 +55,9 @@ const ProfileScreen: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-black">      
-      <LinearGradient colors={["#22C55E", "#000000"]}>
-        <View className="py-8 px-6 flex-row items-center">
+    <View className="flex-1 bg-black">
+      <LinearGradient colors={["#1ed760", "#000000"]}>
+        <View className="py-14 px-6 flex-row items-center">
           <Ionicons name="person-circle-outline" size={80} color="white" />
           <Text className="text-3xl font-bold text-white ml-4">My Profile</Text>
         </View>
