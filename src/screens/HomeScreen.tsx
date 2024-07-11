@@ -37,7 +37,7 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     fetchTopTracks();
-  });
+  },[]);
 
   const fetchTopTracks = async () => {
     try {
