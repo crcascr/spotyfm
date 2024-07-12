@@ -85,6 +85,9 @@ const HomeScreen: React.FC = () => {
       className="flex-row items-center p-4 border-b border-gray-800"
       onPress={() => handleTrackPress(item)}
     >
+      <Text className="text-sm text-white pr-4">
+        {parseInt(item["@attr"].rank) + 1}
+      </Text>
       <Image
         source={{
           uri: item.image[1]["#text"] || "https://via.placeholder.com/64",
@@ -92,12 +95,12 @@ const HomeScreen: React.FC = () => {
         className="w-16 h-16 rounded-sm mr-4"
       />
       <View className="flex-1">
-        <Text className="text-lg font-semibold text-white">{item.name}</Text>
+        <Text className="text-lg font-medium text-white">{item.name}</Text>
         <Text className="text-sm text-gray-400">{item.artist.name}</Text>
       </View>
-      <Text className="text-sm text-gray-400">
-        #{parseInt(item["@attr"].rank) + 1}
-      </Text>
+      <TouchableOpacity>
+        <Ionicons name="ellipsis-vertical" size={20} color="gray" />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
