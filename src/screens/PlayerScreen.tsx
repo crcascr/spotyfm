@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
+import ProgressBar from "../components/ProgressBar";
 
 type RootStackParamList = {
   Home: undefined;
@@ -32,6 +33,37 @@ const PlayerScreen: React.FC = () => {
   const { currentTrack, isPlaying, isShuffled, repeatMode } = useSelector(
     (state: RootState) => state.player
   );
+  const [currentTime, setCurrentTime] = React.useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentTime((prevTime) => {
+          if (prevTime >= parseInt(currentTrack?.duration || "0")) {
+            clearInterval(interval);
+            handleTrackEnd();
+            return 0;
+          }
+          return prevTime + 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [currentTrack, isPlaying]);
+
+  const handleTrackEnd=()=>{
+    if(repeatMode==='track'){
+        setCurrentTime(0);
+        dispatch(togglePlay());
+    }else{
+        dispatch(nextTrack());
+    }
+  }
+
+  const handleSeek = (time: number) => {
+    setCurrentTime(time);
+  };
 
   const handleArtistPress = () => {
     if (currentTrack) {
@@ -52,19 +84,21 @@ const PlayerScreen: React.FC = () => {
 
   return (
     <LinearGradient colors={["#1ed760", "#000000"]} className="p-10 flex-1">
-      
-        <TouchableOpacity className="absolute top-10 left-8" onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-down" size={32} color="white" />
-        </TouchableOpacity>
-        <View className="flex-col justify-center items-center">
-          <Text className="text-white text-sm text-center">PLAYING FROM</Text>
-          <TouchableOpacity onPress={handleArtistPress}>
+      <TouchableOpacity
+        className="absolute top-10 left-8"
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="chevron-down" size={32} color="white" />
+      </TouchableOpacity>
+      <View className="flex-col justify-center items-center">
+        <Text className="text-white text-sm text-center">PLAYING FROM</Text>
+        <TouchableOpacity onPress={handleArtistPress}>
           <Text className="text-white text-sm text-center">
             {currentTrack.artist}
           </Text>
-          </TouchableOpacity>
-        </View>
-      
+        </TouchableOpacity>
+      </View>
+
       <View className="flex-1 items-center justify-center">
         <Image
           source={{ uri: currentTrack.image }}
@@ -78,8 +112,13 @@ const PlayerScreen: React.FC = () => {
             <Text className="text-[#b3b3b3] text-lg">
               {currentTrack.artist}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity>          
         </View>
+        <ProgressBar
+            duration={parseInt(currentTrack.duration)}
+            currentTime={currentTime}
+            onSeek={handleSeek}
+          />
         <View className="flex-row items-center justify-between w-full max-w-md">
           <TouchableOpacity onPress={() => dispatch(setShuffle())}>
             <Ionicons

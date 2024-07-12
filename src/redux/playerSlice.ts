@@ -5,6 +5,7 @@ interface Track {
   name: string;
   artist: string;
   image: string;
+  duration: string;
 }
 
 interface PlayerState {

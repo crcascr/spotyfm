@@ -6,6 +6,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import MiniPlayer from "../components/MiniPlayer";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -21,6 +24,9 @@ interface RecentTrack {
 const ProfileScreen: React.FC = () => {
   const [recentTracks, setRecentTracks] = useState<RecentTrack[]>([]);
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const currentTrack = useSelector(
+    (state: RootState) => state.player.currentTrack
+  );
 
   useEffect(() => {
     loadRecentTracks();
@@ -35,6 +41,10 @@ const ProfileScreen: React.FC = () => {
     } catch (error) {
       console.error("Error loading recent tracks:", error);
     }
+  };
+
+  const handlePlayerPress = () => {
+    navigation.navigate("Player");
   };
 
   const renderTrackItem = ({ item }: { item: RecentTrack }) => (
@@ -56,7 +66,10 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View className="flex-1 bg-black">
-      <LinearGradient colors={["#1ed760", "#000000"]} className="pb-14 pt-20 px-6 ">
+      <LinearGradient
+        colors={["#1ed760", "#000000"]}
+        className="pb-14 pt-20 px-6 "
+      >
         <TouchableOpacity
           className="absolute top-8 left-4 p-1 bg-black/10 rounded-full"
           onPress={() => navigation.goBack()}
@@ -74,6 +87,7 @@ const ProfileScreen: React.FC = () => {
       <FlatList
         data={recentTracks}
         renderItem={renderTrackItem}
+        className="mb-20"
         keyExtractor={(item, index) => index.toString()}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center p-8">
@@ -87,6 +101,7 @@ const ProfileScreen: React.FC = () => {
           </View>
         }
       />
+      {currentTrack && <MiniPlayer onPress={handlePlayerPress} />}
     </View>
   );
 };

@@ -16,6 +16,7 @@ interface Track {
     rank: string;
   };
   mbid?: string;
+  duration: string;
 }
 
 export const getTopTracks = async (country: string): Promise<Track[]> => {

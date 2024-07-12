@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
+import MiniPlayer from "../components/MiniPlayer";
 
 type RootStackParamList = {
   Home: undefined;
@@ -35,6 +36,7 @@ interface Track {
     rank: string;
   };
   mbid?: string;
+  duration: string;
 }
 
 const HomeScreen: React.FC = () => {
@@ -89,6 +91,7 @@ const HomeScreen: React.FC = () => {
       name: track.name,
       artist: track.artist.name,
       image: track.image[1]["#text"] || "https://via.placeholder.com/64",
+      duration: track.duration,
     };
     dispatch(setCurrentTrack(formattedTrack));
     dispatch(togglePlay());
@@ -99,6 +102,7 @@ const HomeScreen: React.FC = () => {
           name: t.name,
           artist: t.artist.name,
           image: t.image[1]["#text"] || "https://via.placeholder.com/64",
+          duration: t.duration,
         }))
       )
     );
@@ -162,33 +166,7 @@ const HomeScreen: React.FC = () => {
         keyExtractor={(item) => item.mbid || item.name}
       />
       {currentTrack && (
-        <TouchableOpacity
-          className="absolute bottom-2 left-1 right-1 bg-gray-900 px-4 py-2 rounded-md flex-row items-center"
-          onPress={handlePlayerPress}
-        >
-          <Image
-            source={{
-              uri: currentTrack.image || "https://via.placeholder.com/64",
-            }}
-            className="w-10 h-10 rounded-sm mr-4"
-          />
-          <View className="flex-1">
-            <Text className="text-white font-semibold">
-              {currentTrack.name}
-            </Text>
-            <Text className="text-gray-400">{currentTrack.artist}</Text>
-          </View>
-          <TouchableOpacity
-            className="ml-4"
-            onPress={() => dispatch(togglePlay())}
-          >
-            <Ionicons
-              name={isPlaying ? "pause" : "play"}
-              size={24}
-              color="white"
-            />
-          </TouchableOpacity>
-        </TouchableOpacity>
+        <MiniPlayer onPress={handlePlayerPress} />        
       )}
     </View>
   );
