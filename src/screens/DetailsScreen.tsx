@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
-import { getRandomColor } from "../utils/helpers";
+import { getRandomColor, openLink, parseHTML } from "../utils/helpers";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
 
@@ -74,6 +74,8 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
+  const{ text, link, linkText}=parseHTML(artistInfo.bio.summary);
+
   return (
     <View className="flex-1">
       <ScrollView className="flex-1 bg-black">
@@ -113,8 +115,13 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </LinearGradient>
 
         <View className="p-4">
-          <Text className="text-xl font-semibold text-white mb-2">About</Text>
-          <Text className="text-gray-300 mb-4">{artistInfo.bio.summary}</Text>
+          <Text className="text-xl font-semibold text-white mb-2">About</Text>          
+          <Text className="text-gray-300 ">{text}</Text>
+          {link && linkText &&(
+            <TouchableOpacity onPress={()=>openLink(link)}>
+              <Text className="text-blue-500 underline mb-4">{linkText}</Text>
+            </TouchableOpacity>
+          )}
 
           <Text className="text-xl font-semibold text-white mb-2">Tags</Text>
           <View className="flex-row flex-wrap mb-4">

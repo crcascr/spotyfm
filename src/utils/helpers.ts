@@ -1,3 +1,5 @@
+import { Linking } from "react-native";
+
 // Get random first color for linear gradient
 const contrastColors = [
   "#1e90ff", // Dodger Blue
@@ -20,4 +22,41 @@ const contrastColors = [
 export const getRandomColor = () => {
   const randomIndex = Math.floor(Math.random() * contrastColors.length);
   return contrastColors[randomIndex];
+};
+
+// Pase HTML
+
+interface ParsedHTML {
+  text: string;
+  link: string | null;
+  linkText: string | null;
 }
+
+export const parseHTML = (html: string): ParsedHTML => {  
+  const parts=html.split('<a href="');
+
+  if (parts.length === 1) {
+    return{
+      text: html,
+      link: null,
+      linkText: null,
+    }
+  }
+
+  const text = parts[0];
+  const linkParts = parts[1].split('">');
+  const link = linkParts[0];
+  const linkText='Read more on Last.fm';
+
+  return {
+    text,
+    link,
+    linkText
+  };
+};
+
+export const openLink = (url: string) => {
+  Linking.openURL(url).catch((err) =>
+    console.error("Error opening link:", err)
+  );
+};
