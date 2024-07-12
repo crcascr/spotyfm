@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
+import { getRandomColor } from "../utils/helpers";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
 
@@ -77,7 +78,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     <View className="flex-1">
       <ScrollView className="flex-1 bg-black">
         <LinearGradient
-          colors={["#1ed760", "#000000"]}
+          colors={[getRandomColor(), "#000000"]}
           className="py-4 pb-4 pt-14"
         >
           <TouchableOpacity

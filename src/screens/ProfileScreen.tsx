@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
+import { getRandomColor } from "../utils/helpers";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -67,7 +68,7 @@ const ProfileScreen: React.FC = () => {
   return (
     <View className="flex-1 bg-black">
       <LinearGradient
-        colors={["#1ed760", "#000000"]}
+        colors={[getRandomColor(), "#000000"]}
         className="pb-14 pt-20 px-6 "
       >
         <TouchableOpacity
