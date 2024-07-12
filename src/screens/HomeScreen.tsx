@@ -6,10 +6,15 @@ import { getTopTracks } from "../services/lastfm";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
 
 type RootStackParamList = {
   Home: undefined;
   Details: { artist: string };
+  Profile: undefined;
+  Player: undefined;
 };
 
 type HomeSreenNavigationProp = NativeStackNavigationProp<
@@ -35,8 +40,12 @@ interface Track {
 const HomeScreen: React.FC = () => {
   const [topTracks, setTopTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentlyPlaying, setCurrentlyPlaying] = useState<Track | null>(null);
   const navigation = useNavigation<HomeSreenNavigationProp>();
+  const dispatch = useDispatch();
+  const currentTrack = useSelector(
+    (state: RootState) => state.player.currentTrack
+  );
+  const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
 
   useEffect(() => {
     fetchTopTracks();
@@ -75,9 +84,25 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleTrackPress = (track: Track) => {
-    setCurrentlyPlaying(track);
+    const formattedTrack = {
+      id: track.mbid || track.name,
+      name: track.name,
+      artist: track.artist.name,
+      image: track.image[1]["#text"] || "https://via.placeholder.com/64",
+    };
+    dispatch(setCurrentTrack(formattedTrack));
+    dispatch(togglePlay());
+    dispatch(
+      setQueue(
+        topTracks.map((t) => ({
+          id: t.mbid || t.name,
+          name: t.name,
+          artist: t.artist.name,
+          image: t.image[1]["#text"] || "https://via.placeholder.com/64",
+        }))
+      )
+    );
     saveRecentTrack(track);
-    navigation.navigate("Details", { artist: track.artist.name });
   };
 
   const renderTrackItem = ({ item }: { item: Track }) => (
@@ -104,11 +129,15 @@ const HomeScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
+  const handlePlayerPress = () => {
+    navigation.navigate("Player");
+  };
+
   if (loading) {
     return (
-        <View className="flex-1 pt-14 justify-center items-center bg-black">
-          <Text className="text-lg text-gray-300">Loading...</Text>
-        </View>
+      <View className="flex-1 pt-14 justify-center items-center bg-black">
+        <Text className="text-lg text-gray-300">Loading...</Text>
+      </View>
     );
   }
 
@@ -132,28 +161,34 @@ const HomeScreen: React.FC = () => {
         renderItem={renderTrackItem}
         keyExtractor={(item) => item.mbid || item.name}
       />
-      {currentlyPlaying && (
-        <View className="absolute bottom-2 left-1 right-1 bg-gray-900 px-4 py-2 rounded-md flex-row items-center">
+      {currentTrack && (
+        <TouchableOpacity
+          className="absolute bottom-2 left-1 right-1 bg-gray-900 px-4 py-2 rounded-md flex-row items-center"
+          onPress={handlePlayerPress}
+        >
           <Image
             source={{
-              uri:
-                currentlyPlaying.image[1]["#text"] ||
-                "https://via.placeholder.com/64",
+              uri: currentTrack.image || "https://via.placeholder.com/64",
             }}
             className="w-10 h-10 rounded-sm mr-4"
           />
           <View className="flex-1">
             <Text className="text-white font-semibold">
-              {currentlyPlaying.name}
+              {currentTrack.name}
             </Text>
-            <Text className="text-gray-400">
-              {currentlyPlaying.artist.name}
-            </Text>
+            <Text className="text-gray-400">{currentTrack.artist}</Text>
           </View>
-          <TouchableOpacity className="ml-4">
-            <Ionicons name="pause" size={24} color="white" />
+          <TouchableOpacity
+            className="ml-4"
+            onPress={() => dispatch(togglePlay())}
+          >
+            <Ionicons
+              name={isPlaying ? "pause" : "play"}
+              size={24}
+              color="white"
+            />
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   );
