@@ -56,8 +56,14 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View className="flex-1 bg-black">
-      <LinearGradient colors={["#1ed760", "#000000"]}>
-        <View className="py-14 px-6 flex-row items-center">
+      <LinearGradient colors={["#1ed760", "#000000"]} className="pb-14 pt-20 px-6 ">
+        <TouchableOpacity
+          className="absolute top-8 left-4 p-1 bg-black/10 rounded-full"
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={32} color="white" />
+        </TouchableOpacity>
+        <View className="flex-row items-center">
           <Ionicons name="person-circle-outline" size={80} color="white" />
           <Text className="text-3xl font-bold text-white ml-4">My Profile</Text>
         </View>

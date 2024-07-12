@@ -13,6 +13,7 @@ import { RootStackParamList } from "../types/navigation";
 import { getArtistInfo } from "../services/lastfm";
 import { LinearGradient } from "expo-linear-gradient";
 import { capitalizeFirstLetter } from "../utils/helpers";
+import { Ionicons } from "@expo/vector-icons";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
 
@@ -65,7 +66,13 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <ScrollView className="flex-1 bg-black">
-      <LinearGradient colors={["#1ed760", "#000000"]} className="p-4 pt-14">
+      <LinearGradient colors={["#1ed760", "#000000"]} className="py-4 pb-4 pt-14">
+      <TouchableOpacity
+          className="absolute top-8 left-4 p-1 bg-black/10 rounded-full"
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={32} color="white" />
+        </TouchableOpacity>
         <Image
           source={{
             uri:
