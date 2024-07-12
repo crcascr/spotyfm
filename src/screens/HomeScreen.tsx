@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
 import MiniPlayer from "../components/MiniPlayer";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 type RootStackParamList = {
   Home: undefined;
@@ -48,6 +55,15 @@ const HomeScreen: React.FC = () => {
     (state: RootState) => state.player.currentTrack
   );
   const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
+
+  // Bottom sheet
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["25%", "50%"], []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    //console.log("handleSheetChanges", index);
+  }, []);
 
   useEffect(() => {
     fetchTopTracks();
@@ -109,12 +125,33 @@ const HomeScreen: React.FC = () => {
     saveRecentTrack(track);
   };
 
+  // Bottom sheet controls
+  const handleOptionsPress = (track: Track) => {
+    setSelectedTrack(track);
+    bottomSheetRef.current?.expand();
+  };
+
+  const handleGoToDetails = () => {
+    if (selectedTrack) {
+      navigation.navigate("Details", { artist: selectedTrack.artist.name });
+    }
+    bottomSheetRef.current?.close();
+  };
+
   const renderTrackItem = ({ item }: { item: Track }) => (
     <TouchableOpacity
-      className="flex-row items-center p-4 border-b border-gray-800"
+      className={`flex-row items-center p-4 border-b border-gray-800 ${
+        currentTrack && currentTrack.name === item.name ? "bg-gray-900" : ""
+      }`}
       onPress={() => handleTrackPress(item)}
     >
-      <Text className="text-sm text-white pr-4">
+      <Text
+        className={`text-sm pr-4 ${
+          currentTrack && currentTrack.name === item.name
+            ? "text-green-500"
+            : "text-white"
+        }`}
+      >
         {parseInt(item["@attr"].rank) + 1}
       </Text>
       <Image
@@ -124,10 +161,18 @@ const HomeScreen: React.FC = () => {
         className="w-16 h-16 rounded-sm mr-4"
       />
       <View className="flex-1">
-        <Text className="text-lg font-medium text-white">{item.name}</Text>
+        <Text
+          className={`text-lg font-medium ${
+            currentTrack && currentTrack.name === item.name
+              ? "text-green-500"
+              : "text-white"
+          }`}
+        >
+          {item.name}
+        </Text>
         <Text className="text-sm text-gray-400">{item.artist.name}</Text>
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => handleOptionsPress(item)}>
         <Ionicons name="ellipsis-vertical" size={20} color="gray" />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -165,9 +210,52 @@ const HomeScreen: React.FC = () => {
         renderItem={renderTrackItem}
         keyExtractor={(item) => item.mbid || item.name}
       />
-      {currentTrack && (
-        <MiniPlayer onPress={handlePlayerPress} />        
-      )}
+      {currentTrack && <MiniPlayer onPress={handlePlayerPress} />}
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        enablePanDownToClose={true}
+        backgroundStyle={{
+          backgroundColor: "#242424",
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: "#b3b3b3",
+        }}
+      >
+        <View className="flex-1 py-4 bg-[#242424]">
+          <View className="flex-row items-center pb-4 border-b border-b-gray-400">
+            <View className="pl-4 flex-row items-center">
+              <Image
+                source={{
+                  uri:
+                    selectedTrack?.image[1]["#text"] ||
+                    "https://via.placeholder.com/64",
+                }}
+                className="w-16 h-16 rounded-sm mr-4"
+              />
+              <View className="flex-1 ">
+                <Text className="text-lg font-bold text-white">
+                  {selectedTrack?.name}
+                </Text>
+                <Text className="text-sm text-gray-400">
+                  {selectedTrack?.artist.name}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View className="px-4">
+            <TouchableOpacity
+              className="py-4 flex-row items-center"
+              onPress={handleGoToDetails}
+            >
+              <Ionicons name="person-add" size={24} color="white" />
+              <Text className="text-white text-xl ml-4">View Artist</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 };
