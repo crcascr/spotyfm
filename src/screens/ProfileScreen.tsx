@@ -6,10 +6,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
 import { getRandomColor } from "../utils/helpers";
+import { setRecentTracks } from "../redux/playerSlice";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -23,11 +24,11 @@ interface RecentTrack {
 }
 
 const ProfileScreen: React.FC = () => {
-  const [recentTracks, setRecentTracks] = useState<RecentTrack[]>([]);
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const currentTrack = useSelector(
-    (state: RootState) => state.player.currentTrack
+  const { currentTrack, recentTracks } = useSelector(
+    (state: RootState) => state.player
   );
+  const dispatch = useDispatch();
 
   useEffect(() => {
     loadRecentTracks();
@@ -37,7 +38,7 @@ const ProfileScreen: React.FC = () => {
     try {
       const storedTracks = await AsyncStorage.getItem("recentTracks");
       if (storedTracks) {
-        setRecentTracks(JSON.parse(storedTracks));
+        dispatch(setRecentTracks(JSON.parse(storedTracks)));
       }
     } catch (error) {
       console.error("Error loading recent tracks:", error);

@@ -105,27 +105,7 @@ const HomeScreen: React.FC = () => {
     loadFavorites();
   }, [dispatch]);
 
-  const saveRecentTrack = async (track: Track) => {
-    try {
-      const recentTrack = {
-        name: track.name,
-        artist: track.artist.name,
-        image: track.image[1]["#text"] || "https://via.placeholder.com/64",
-      };
-
-      const storedTracks = await AsyncStorage.getItem("recentTracks");
-      let recentTracks = storedTracks ? JSON.parse(storedTracks) : [];
-
-      recentTracks.unshift(recentTrack);
-
-      recentTracks = recentTracks.slice(0, 10);
-
-      await AsyncStorage.setItem("recentTracks", JSON.stringify(recentTracks));
-    } catch (error) {
-      console.error("Error saving recent track:", error);
-    }
-  };
-
+  // Track press handler
   const handleTrackPress = (track: Track) => {
     const formattedTrack = {
       id: track.mbid || track.name,
@@ -135,7 +115,7 @@ const HomeScreen: React.FC = () => {
       duration: track.duration,
     };
     dispatch(setCurrentTrack(formattedTrack));
-    dispatch(togglePlay());
+    if (!isPlaying) dispatch(togglePlay());
     dispatch(
       setQueue(
         topTracks.map((t) => ({
@@ -147,7 +127,6 @@ const HomeScreen: React.FC = () => {
         }))
       )
     );
-    saveRecentTrack(track);
   };
 
   // Favorite press handler
@@ -219,17 +198,9 @@ const HomeScreen: React.FC = () => {
         onPress={() => handleFavoritePress(item)}
       >
         <Ionicons
-          name={
-            isFavorite(item)
-              ? "heart"
-              : "heart-outline"
-          }
+          name={isFavorite(item) ? "heart" : "heart-outline"}
           size={20}
-          color={
-            isFavorite(item)
-              ? "#1DB954"
-              : "white"
-          }
+          color={isFavorite(item) ? "#1DB954" : "white"}
         />
       </TouchableOpacity>
       <TouchableOpacity
