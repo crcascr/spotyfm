@@ -14,10 +14,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
+import {
+  setCurrentTrack,
+  setFavorites,
+  setQueue,
+  toggleFavorite,
+  togglePlay,
+} from "../redux/playerSlice";
 import MiniPlayer from "../components/MiniPlayer";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { openLink } from "../utils/helpers";
+import { getGreeting, openLink } from "../utils/helpers";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 type RootStackParamList = {
@@ -25,6 +31,7 @@ type RootStackParamList = {
   Details: { artist: string };
   Profile: undefined;
   Player: undefined;
+  Favorites: undefined;
 };
 
 type HomeSreenNavigationProp = NativeStackNavigationProp<
@@ -54,8 +61,8 @@ const HomeScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<HomeSreenNavigationProp>();
   const dispatch = useDispatch();
-  const currentTrack = useSelector(
-    (state: RootState) => state.player.currentTrack
+  const { currentTrack, favorites } = useSelector(
+    (state: RootState) => state.player
   );
   const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
 
@@ -82,6 +89,21 @@ const HomeScreen: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Load favorites from AsyncStorage
+  useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const storedFavorites = await AsyncStorage.getItem("favorites");
+        if (storedFavorites) {
+          dispatch(setFavorites(JSON.parse(storedFavorites)));
+        }
+      } catch (error) {
+        console.error("Error loading favorites:", error);
+      }
+    };
+    loadFavorites();
+  }, [dispatch]);
 
   const saveRecentTrack = async (track: Track) => {
     try {
@@ -126,6 +148,23 @@ const HomeScreen: React.FC = () => {
       )
     );
     saveRecentTrack(track);
+  };
+
+  // Favorite press handler
+  const handleFavoritePress = (track: Track) => {
+    const formattedFavorite = {
+      id: track.mbid || track.name,
+      name: track.name,
+      artist: track.artist.name,
+      image: track.image[1]["#text"] || "https://via.placeholder.com/64",
+      duration: track.duration,
+    };
+    dispatch(toggleFavorite(formattedFavorite));
+  };
+
+  // Favorite verification
+  const isFavorite = (track: Track) => {
+    return favorites.some((favorite) => favorite.id === track.mbid);
   };
 
   // Bottom sheet controls
@@ -175,7 +214,28 @@ const HomeScreen: React.FC = () => {
         </Text>
         <Text className="text-sm text-gray-400">{item.artist.name}</Text>
       </View>
-      <TouchableOpacity className="p-4" onPress={() => handleOptionsPress(item)}>
+      <TouchableOpacity
+        className="p-4"
+        onPress={() => handleFavoritePress(item)}
+      >
+        <Ionicons
+          name={
+            isFavorite(item)
+              ? "heart"
+              : "heart-outline"
+          }
+          size={20}
+          color={
+            isFavorite(item)
+              ? "#1DB954"
+              : "white"
+          }
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        className="p-4"
+        onPress={() => handleOptionsPress(item)}
+      >
         <Ionicons name="ellipsis-vertical" size={20} color="gray" />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -185,16 +245,18 @@ const HomeScreen: React.FC = () => {
     navigation.navigate("Player");
   };
 
+  const handleFavoritesPress = () => {
+    navigation.navigate("Favorites");
+  };
+
   if (loading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <View className="flex-1 bg-black">
+    <View className={`flex-1 bg-black ${currentTrack && "pb-20"}`}>
       <LinearGradient colors={["#1ED760", "#000000"]}>
-        <View className="flex-row items-center px-4 py-14">
+        <View className="flex-row items-center px-4 pt-14 pb-8">
           <TouchableOpacity
             className="bg-[#1ed760] p-2 rounded-full"
             onPress={() => navigation.navigate("Profile")}
@@ -202,9 +264,26 @@ const HomeScreen: React.FC = () => {
             <Ionicons name="person" size={24} color="white" />
           </TouchableOpacity>
           <Text className="text-2xl ml-4 font-bold text-white">
-            Top Tracks in Colombia
+            {getGreeting()}
           </Text>
         </View>
+        <TouchableOpacity
+          className="flex-row items-center bg-black/70 ml-4 rounded-lg w-[45%] mb-4"
+          onPress={handleFavoritesPress}
+        >
+          <LinearGradient
+            colors={["#4508f3", "#ffffff"]}
+            className="p-4 items-center rounded-l-lg"
+          >
+            <Ionicons name="heart" size={24} color="white" />
+          </LinearGradient>
+          <Text className="text-base font-extrabold ml-4 text-white">
+            Favorites
+          </Text>
+        </TouchableOpacity>
+        <Text className="text-2xl ml-4 mb-4 font-bold text-white">
+          Top Tracks in Colombia
+        </Text>
       </LinearGradient>
       <FlatList
         data={topTracks}

@@ -159,7 +159,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                   className="w-24 h-24 rounded-full mb-2"
                 />
                 <Text
-                  className="text-gray-300 text-left w-24"
+                  className="text-gray-300 text-center w-24"
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >

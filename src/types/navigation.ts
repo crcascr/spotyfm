@@ -3,4 +3,5 @@ export type RootStackParamList = {
     Details: { artist: string };
     Profile: undefined;
     Player: undefined;
+    Favorites: undefined;
   };

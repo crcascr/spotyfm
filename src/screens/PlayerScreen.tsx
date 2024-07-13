@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootState } from "../redux/store";
 import {
   togglePlay,
@@ -8,6 +9,8 @@ import {
   prevTrack,
   setShuffle,
   setRepeatMode,
+  toggleFavorite,
+  setFavorites,
 } from "../redux/playerSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -30,12 +33,12 @@ type PlayerScreenNavigationProp = NativeStackNavigationProp<
 const PlayerScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<PlayerScreenNavigationProp>();
-  const { currentTrack, isPlaying, isShuffled, repeatMode } = useSelector(
-    (state: RootState) => state.player
-  );
+  const { currentTrack, isPlaying, isShuffled, repeatMode, favorites } =
+    useSelector((state: RootState) => state.player);
   const [currentTime, setCurrentTime] = React.useState(0);
 
   useEffect(() => {
+    loadFavorites();
     let interval: NodeJS.Timeout;
     if (isPlaying) {
       interval = setInterval(() => {
@@ -52,14 +55,14 @@ const PlayerScreen: React.FC = () => {
     return () => clearInterval(interval);
   }, [currentTrack, isPlaying]);
 
-  const handleTrackEnd=()=>{
-    if(repeatMode==='track'){
-        setCurrentTime(0);
-        dispatch(togglePlay());
-    }else{
-        dispatch(nextTrack());
+  const handleTrackEnd = () => {
+    if (repeatMode === "track") {
+      setCurrentTime(0);
+      dispatch(togglePlay());
+    } else {
+      dispatch(nextTrack());
     }
-  }
+  };
 
   const handleSeek = (time: number) => {
     setCurrentTime(time);
@@ -70,6 +73,30 @@ const PlayerScreen: React.FC = () => {
       navigation.navigate("Details", { artist: currentTrack.artist });
     }
   };
+
+  // Load favorites from AsyncStorage
+  const loadFavorites = async () => {
+    try {
+      const storedFavorites = await AsyncStorage.getItem("favorites");
+      if (storedFavorites !== null) {
+        dispatch(setFavorites(JSON.parse(storedFavorites)));
+      }
+    } catch (error) {
+      console.error("Error loading favorites:", error);
+    }
+  };
+
+  // Favorite press handler
+  const handleFavoritePress = () => {
+    if (currentTrack) {
+      dispatch(toggleFavorite(currentTrack));
+    }
+  };
+
+  // Favorite verification
+  const isFavorite = currentTrack
+    ? favorites.some((track) => track.id === currentTrack.id)
+    : false;
 
   if (!currentTrack) {
     return (
@@ -112,13 +139,13 @@ const PlayerScreen: React.FC = () => {
             <Text className="text-[#b3b3b3] text-lg">
               {currentTrack.artist}
             </Text>
-          </TouchableOpacity>          
+          </TouchableOpacity>
         </View>
         <ProgressBar
-            duration={parseInt(currentTrack.duration)}
-            currentTime={currentTime}
-            onSeek={handleSeek}
-          />
+          duration={parseInt(currentTrack.duration)}
+          currentTime={currentTime}
+          onSeek={handleSeek}
+        />
         <View className="flex-row items-center justify-between w-full max-w-md">
           <TouchableOpacity onPress={() => dispatch(setShuffle())}>
             <Ionicons
@@ -157,6 +184,15 @@ const PlayerScreen: React.FC = () => {
               name={repeatMode === "track" ? "repeat" : "repeat-outline"}
               size={24}
               color={repeatMode !== "off" ? "#1DB954" : "#b3b3b3"}
+            />
+          </TouchableOpacity>
+        </View>
+        <View className="flex-row items-center justify-between w-full max-w-md">
+          <TouchableOpacity onPress={handleFavoritePress}>
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={28}
+              color={isFavorite ? "#1DB954" : "white"}
             />
           </TouchableOpacity>
         </View>

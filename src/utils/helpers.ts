@@ -24,34 +24,33 @@ export const getRandomColor = () => {
   return contrastColors[randomIndex];
 };
 
-// Pase HTML
-
+// Pase HTML to get text and link
 interface ParsedHTML {
   text: string;
   link: string | null;
   linkText: string | null;
 }
 
-export const parseHTML = (html: string): ParsedHTML => {  
-  const parts=html.split('<a href="');
+export const parseHTML = (html: string): ParsedHTML => {
+  const parts = html.split('<a href="');
 
   if (parts.length === 1) {
-    return{
+    return {
       text: html,
       link: null,
       linkText: null,
-    }
+    };
   }
 
   const text = parts[0];
   const linkParts = parts[1].split('">');
   const link = linkParts[0];
-  const linkText='Read more on Last.fm';
+  const linkText = "Read more on Last.fm";
 
   return {
     text,
     link,
-    linkText
+    linkText,
   };
 };
 
@@ -59,4 +58,17 @@ export const openLink = (url: string) => {
   Linking.openURL(url).catch((err) =>
     console.error("Error opening link:", err)
   );
+};
+
+// Greeting message
+export const getGreeting = () => {
+  const currentHour = new Date().getHours();
+
+  if (currentHour < 12) {
+    return "Good morning";
+  } else if (currentHour < 18) {
+    return "Good afternoon";
+  } else {
+    return "Good evening";
+  }
 };

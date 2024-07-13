@@ -50,7 +50,9 @@ const ProfileScreen: React.FC = () => {
 
   const renderTrackItem = ({ item }: { item: RecentTrack }) => (
     <TouchableOpacity
-      className="flex-row items-center p-4 border-b border-gray-800"
+      className={`flex-row items-center p-4 border-b border-gray-800 ${
+        currentTrack && currentTrack.name === item.name ? "bg-gray-900" : ""
+      }`}
       onPress={() => navigation.navigate("Details", { artist: item.artist })}
     >
       <Image
@@ -58,7 +60,15 @@ const ProfileScreen: React.FC = () => {
         className="w-12 h-12 rounded-sm mr-4"
       />
       <View className="flex-1">
-        <Text className="text-base font-semibold text-white">{item.name}</Text>
+        <Text
+          className={`text-base font-semibold ${
+            currentTrack && currentTrack.name === item.name
+              ? "text-green-500"
+              : "text-white"
+          }`}
+        >
+          {item.name}
+        </Text>
         <Text className="text-sm text-gray-400">{item.artist}</Text>
       </View>
       <Ionicons name="chevron-forward-outline" size={24} color="white" />

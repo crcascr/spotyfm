@@ -12,6 +12,7 @@ import { store } from "./src/redux/store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import "./global.css";
+import FavoritesScreen from "./src/screens/FavoritesScreen";
 //import 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -42,6 +43,7 @@ const App: React.FC = () => {
             <Stack.Screen name="Details" component={DetailsScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Player" component={PlayerScreen} />
+            <Stack.Screen name="Favorites" component={FavoritesScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </GestureHandlerRootView>

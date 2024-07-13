@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Track {
@@ -14,6 +15,7 @@ interface PlayerState {
   isPlaying: boolean;
   isShuffled: boolean;
   repeatMode: "off" | "track" | "queue";
+  favorites: Track[];
 }
 
 const initialState: PlayerState = {
@@ -22,6 +24,7 @@ const initialState: PlayerState = {
   isPlaying: false,
   isShuffled: false,
   repeatMode: "off",
+  favorites: [],
 };
 
 export const playerSlice = createSlice({
@@ -64,10 +67,25 @@ export const playerSlice = createSlice({
     ) => {
       state.repeatMode = action.payload;
     },
+
+    toggleFavorite: (state, action: PayloadAction<Track>) => {
+      const index = state.favorites.findIndex(
+        (track) => track.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.favorites.splice(index, 1);
+      } else {
+        state.favorites.push(action.payload);
+      }
+      AsyncStorage.setItem("favorites", JSON.stringify(state.favorites));
+    },
+    setFavorites: (state, action: PayloadAction<Track[]>) => {
+      state.favorites = action.payload;
+    },
   },
 });
 
-export const{
+export const {
   setCurrentTrack,
   setQueue,
   addToQueue,
@@ -75,6 +93,8 @@ export const{
   nextTrack,
   prevTrack,
   setShuffle,
-  setRepeatMode
-}= playerSlice.actions;
+  setRepeatMode,
+  toggleFavorite,
+  setFavorites,
+} = playerSlice.actions;
 export default playerSlice.reducer;
