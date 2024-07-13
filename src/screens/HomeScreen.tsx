@@ -17,6 +17,7 @@ import { RootState } from "../redux/store";
 import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
 import MiniPlayer from "../components/MiniPlayer";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { openLink } from "../utils/helpers";
 
 type RootStackParamList = {
   Home: undefined;
@@ -34,6 +35,7 @@ interface Track {
   name: string;
   artist: {
     name: string;
+    url: string;
   };
   image: Array<{
     "#text": string;
@@ -172,7 +174,7 @@ const HomeScreen: React.FC = () => {
         </Text>
         <Text className="text-sm text-gray-400">{item.artist.name}</Text>
       </View>
-      <TouchableOpacity onPress={() => handleOptionsPress(item)}>
+      <TouchableOpacity className="p-4" onPress={() => handleOptionsPress(item)}>
         <Ionicons name="ellipsis-vertical" size={20} color="gray" />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -253,6 +255,17 @@ const HomeScreen: React.FC = () => {
               <Ionicons name="person-add" size={24} color="white" />
               <Text className="text-white text-xl ml-4">View Artist</Text>
             </TouchableOpacity>
+            {selectedTrack?.artist.url && (
+              <TouchableOpacity
+                className="py-4 flex-row items-center"
+                onPress={() => openLink(selectedTrack.artist.url)}
+              >
+                <Ionicons name="link-outline" size={24} color="white" />
+                <Text className="text-white text-xl ml-4">
+                  Discover more on Last.fm
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </BottomSheet>

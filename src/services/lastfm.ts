@@ -7,6 +7,7 @@ interface Track {
   name: string;
   artist: {
     name: string;
+    url: string;
   };
   image: Array<{
     "#text": string;
