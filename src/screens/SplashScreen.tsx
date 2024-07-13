@@ -5,7 +5,7 @@ import { SvgXml } from "react-native-svg";
 
 const logoSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <circle cx="100" cy="100" r="100" fill="#191414" />
+  <circle cx="100" cy="100" r="100" fill="#000000" />
   <path d="M60,100 Q100,140 140,100 T220,100" stroke="#1ED760" stroke-width="12" fill="none" />
   <circle cx="60" cy="100" r="10" fill="#1ED760" />
   <circle cx="140" cy="100" r="10" fill="#1ED760" />
@@ -17,7 +17,7 @@ const logoSvg = `
 const SplashScreen = () => {
   return (
     <LinearGradient
-      colors={["#191414", "#1ED760"]}
+      colors={["#000000", "#1ED760"]}
       className="flex-1 items-center justify-center"
     >
       <SvgXml xml={logoSvg} width={200} height={200} />
