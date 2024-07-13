@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
 import { getRandomColor, openLink, parseHTML } from "../utils/helpers";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, "Details">;
 
@@ -54,9 +55,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#1DB954" />
-      </View>
+      <LoadingSpinner />
     );
   }
 
@@ -105,7 +104,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             listeners
           </Text>
           <View className="flex-row justify-center mb-4">
-            <TouchableOpacity className="bg-[#1ed760] px-6 py-2 rounded-full mr-2">
+            <TouchableOpacity className="bg-[#1ED760] px-6 py-2 rounded-full mr-2">
               <Text className="text-white font-semibold">Follow</Text>
             </TouchableOpacity>
             <TouchableOpacity className="border border-white px-6 py-2 rounded-full">

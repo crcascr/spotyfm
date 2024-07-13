@@ -18,6 +18,7 @@ import { setCurrentTrack, setQueue, togglePlay } from "../redux/playerSlice";
 import MiniPlayer from "../components/MiniPlayer";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { openLink } from "../utils/helpers";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 type RootStackParamList = {
   Home: undefined;
@@ -186,9 +187,7 @@ const HomeScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 pt-14 justify-center items-center bg-black">
-        <Text className="text-lg text-gray-300">Loading...</Text>
-      </View>
+      <LoadingSpinner />
     );
   }
 
