@@ -92,7 +92,7 @@ I would like to express my gratitude for the following libraries and tools, whic
 - [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/), [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context), [react-native-screens](https://github.com/software-mansion/react-native-screens), and [react-native-svg](https://github.com/software-mansion/react-native-svg): For their invaluable contributions to the functionality and user experience of the app.
 - [expo-updates](https://www.npmjs.com/package/expo-updates): For ensuring that our app stays up to date with the latest features and improvements.
 
-Special thanks to the creators and maintainers of these libraries and tools for their continuous efforts and contributions to the open-source community. Your work has been instrumental in the development of SpotyFM.
+Special thanks to the creators and maintainers of these libraries and tools for their continuous efforts and contributions to the open-source community. Your work has been instrumental in the development of Spoty.fm.
 
 
 Developed with ❤️ by Cristian Castillo
