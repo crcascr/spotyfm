@@ -2,10 +2,10 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
-import { setCurrentTrack, toggleFavorite } from "../redux/playerSlice";
+import { setCurrentTrack, setQueue, toggleFavorite } from "../redux/playerSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { getRandomColor, openLink } from "../utils/helpers";
+import { getRandomColor } from "../utils/helpers";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -45,6 +45,7 @@ const FavoritesScreen: React.FC<Props> = ({ route, navigation }) => {
   const snapPoints = useMemo(() => ["25%", "50%"], []);
 
   const handlePlayTrack = (track: Track) => {
+    dispatch(setQueue(favorites))
     dispatch(setCurrentTrack(track));
   };
 

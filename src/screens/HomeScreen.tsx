@@ -116,17 +116,27 @@ const HomeScreen: React.FC = () => {
     };
     dispatch(setCurrentTrack(formattedTrack));
     if (!isPlaying) dispatch(togglePlay());
-    dispatch(
-      setQueue(
-        topTracks.map((t) => ({
-          id: t.mbid || t.name,
-          name: t.name,
-          artist: t.artist.name,
-          image: t.image[1]["#text"] || "https://via.placeholder.com/64",
-          duration: t.duration,
-        }))
-      )
+
+    const trackIndex = topTracks.findIndex(
+      (t) => t.mbid === track.mbid || t.name === track.name
     );
+    const newQueue = [
+      ...topTracks.slice(trackIndex).map((t) => ({
+        id: t.mbid || t.name,
+        name: t.name,
+        artist: t.artist.name,
+        image: t.image[1]["#text"] || "https://via.placeholder.com/64",
+        duration: t.duration,
+      })),
+      ...topTracks.slice(0, trackIndex).map((t) => ({
+        id: t.mbid || t.name,
+        name: t.name,
+        artist: t.artist.name,
+        image: t.image[1]["#text"] || "https://via.placeholder.com/64",
+        duration: t.duration,
+      })),
+    ];
+    dispatch(setQueue(newQueue));
   };
 
   // Favorite press handler

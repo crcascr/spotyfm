@@ -54,6 +54,15 @@ export const playerSlice = createSlice({
       const validatedTrack = validateTrack(action.payload);
       state.currentTrack = validatedTrack;
       addToRecentTracks(state, validatedTrack);
+      const trackIndex = state.queue.findIndex(
+        (track) => track.id === validatedTrack.id
+      );
+      if (trackIndex === -1) {
+        state.queue = [
+          ...state.queue.slice(trackIndex),
+          ...state.queue.slice(0, trackIndex),
+        ];
+      }
     },
     setQueue: (state, action: PayloadAction<Track[]>) => {
       state.queue = action.payload.map(validateTrack);
@@ -69,23 +78,26 @@ export const playerSlice = createSlice({
         if (state.repeatMode === "track") {
           addToRecentTracks(state, validateTrack(state.currentTrack));
         } else {
-          const currentIndex = state.queue.findIndex(
-            (track) => track.id === state.currentTrack?.id
-          );
+          state.queue.shift();
 
           let nextTrack: Track | undefined;
 
-          if (currentIndex === -1) {
+          if (state.queue.length > 0) {
             nextTrack = state.queue[0];
-          } else if (currentIndex < state.queue.length - 1) {
-            nextTrack = state.queue[currentIndex + 1];
-          } else if (state.repeatMode === "queue" && state.queue.length > 0) {
+          } else if (
+            state.repeatMode === "queue" &&
+            state.recentTracks.length > 0
+          ) {
+            state.queue = [...state.recentTracks];
             nextTrack = state.queue[0];
           }
 
           if (nextTrack) {
             state.currentTrack = validateTrack(nextTrack);
             addToRecentTracks(state, state.currentTrack);
+          } else {
+            state.currentTrack = null;
+            state.isPlaying = false;
           }
         }
       }
@@ -95,21 +107,17 @@ export const playerSlice = createSlice({
         if (state.repeatMode === "track") {
           addToRecentTracks(state, validateTrack(state.currentTrack));
         } else {
-          const currentIndex = state.queue.findIndex(
-            (track) => track.id === state.currentTrack?.id
-          );
-
           let prevTrack: Track | undefined;
 
-          if (currentIndex > 0) {
-            prevTrack = state.queue[currentIndex - 1];
+          if (state.recentTracks.length > 1) {
+            prevTrack = state.recentTracks[1];
+            state.recentTracks = state.recentTracks.slice(1);
           } else if (state.repeatMode === "queue" && state.queue.length > 0) {
             prevTrack = state.queue[state.queue.length - 1];
           }
-
           if (prevTrack) {
             state.currentTrack = validateTrack(prevTrack);
-            addToRecentTracks(state, state.currentTrack);
+            state.queue.unshift(state.currentTrack);
           }
         }
       }
