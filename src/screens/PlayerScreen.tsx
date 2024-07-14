@@ -1,5 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootState } from "../redux/store";
@@ -11,12 +24,22 @@ import {
   setRepeatMode,
   toggleFavorite,
   setFavorites,
+  setCurrentTrack,
 } from "../redux/playerSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
 import ProgressBar from "../components/ProgressBar";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+
+interface Track {
+  id: string;
+  name: string;
+  artist: string;
+  image: string;
+  duration: string;
+}
 
 type RootStackParamList = {
   Home: undefined;
@@ -33,7 +56,7 @@ type PlayerScreenNavigationProp = NativeStackNavigationProp<
 const PlayerScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<PlayerScreenNavigationProp>();
-  const { currentTrack, isPlaying, isShuffled, repeatMode, favorites } =
+  const { currentTrack, isPlaying, isShuffled, repeatMode, favorites, queue } =
     useSelector((state: RootState) => state.player);
   const [currentTime, setCurrentTime] = React.useState(0);
 
@@ -108,6 +131,48 @@ const PlayerScreen: React.FC = () => {
       </LinearGradient>
     );
   }
+
+  // Bottom Sheet config
+  // Ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  // Variables
+  const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
+  // Callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    //console.log("handleSheetChanges",index);
+  }, []);
+
+  // Render queue item
+  const renderQueueItem = ({ item }: { item: Track }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          dispatch(setCurrentTrack(item));
+          bottomSheetRef.current?.close();
+        }}
+        className={`flex-row items-center p-4 border-b border-gray-800 ${
+          currentTrack && currentTrack.name === item.name ? "bg-gray-900" : ""
+        }`}
+      >
+        <Image
+          source={{ uri: item.image }}
+          className="w-12 h-12 rounded mr-4"
+        />
+        <View className="flex-1">
+          <Text
+            className={` font-bold ${
+              currentTrack && currentTrack.name === item.name
+                ? "text-green-500"
+                : "text-white"
+            }`}
+          >
+            {item.name}
+          </Text>
+          <Text className="text-gray-300">{item.artist}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <LinearGradient colors={["#1ed760", "#000000"]} className="p-10 flex-1">
@@ -195,8 +260,61 @@ const PlayerScreen: React.FC = () => {
               color={isFavorite ? "#1DB954" : "white"}
             />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
+            <Ionicons name="filter-outline" size={28} color="white" />
+          </TouchableOpacity>
         </View>
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        enablePanDownToClose={true}
+        backgroundStyle={{
+          backgroundColor: "#242424",
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: "#b3b3b3",
+        }}
+      >
+        <BottomSheetScrollView
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+        >
+          <Text className="text-white text-xl font-bold m-4">Queue</Text>
+          {queue.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                dispatch(setCurrentTrack(item));
+                bottomSheetRef.current?.close();
+              }}
+              className={`flex-row items-center p-4 border-b border-gray-800 ${
+                currentTrack && currentTrack.name === item.name
+                  ? "bg-gray-900"
+                  : ""
+              }`}
+            >
+              <Image
+                source={{ uri: item.image }}
+                className="w-12 h-12 rounded mr-4"
+              />
+              <View className="flex-1">
+                <Text
+                  className={` font-bold ${
+                    currentTrack && currentTrack.name === item.name
+                      ? "text-green-500"
+                      : "text-white"
+                  }`}
+                >
+                  {item.name}
+                </Text>
+                <Text className="text-gray-300">{item.artist}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </BottomSheetScrollView>
+      </BottomSheet>
     </LinearGradient>
   );
 };
