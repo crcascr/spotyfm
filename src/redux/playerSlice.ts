@@ -26,6 +26,7 @@ interface PlayerState {
   repeatMode: "off" | "track" | "queue";
   favorites: Track[];
   recentTracks: Track[];
+  currentTime: number;
 }
 
 const initialState: PlayerState = {
@@ -36,6 +37,7 @@ const initialState: PlayerState = {
   repeatMode: "off",
   favorites: [],
   recentTracks: [],
+  currentTime: 0,
 };
 
 const saveToAsyncStorage = async (key: string, value: any) => {
@@ -54,6 +56,7 @@ export const playerSlice = createSlice({
       const validatedTrack = validateTrack(action.payload);
       state.currentTrack = validatedTrack;
       addToRecentTracks(state, validatedTrack);
+      state.currentTime = 0;
       const trackIndex = state.queue.findIndex(
         (track) => track.id === validatedTrack.id
       );
@@ -149,6 +152,9 @@ export const playerSlice = createSlice({
     setRecentTracks: (state, action: PayloadAction<Track[]>) => {
       state.recentTracks = action.payload;
     },
+    updateCurrentTime: (state, action: PayloadAction<number>) => {
+      state.currentTime = action.payload;
+    },
   },
 });
 
@@ -175,5 +181,6 @@ export const {
   toggleFavorite,
   setFavorites,
   setRecentTracks,
+  updateCurrentTime,
 } = playerSlice.actions;
 export default playerSlice.reducer;

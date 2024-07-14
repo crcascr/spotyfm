@@ -25,6 +25,7 @@ import {
   toggleFavorite,
   setFavorites,
   setCurrentTrack,
+  updateCurrentTime,
 } from "../redux/playerSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -56,31 +57,34 @@ type PlayerScreenNavigationProp = NativeStackNavigationProp<
 const PlayerScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<PlayerScreenNavigationProp>();
-  const { currentTrack, isPlaying, isShuffled, repeatMode, favorites, queue } =
-    useSelector((state: RootState) => state.player);
-  const [currentTime, setCurrentTime] = React.useState(0);
+  const {
+    currentTrack,
+    isPlaying,
+    isShuffled,
+    repeatMode,
+    favorites,
+    queue,
+    currentTime,
+  } = useSelector((state: RootState) => state.player);
 
   useEffect(() => {
     loadFavorites();
     let interval: NodeJS.Timeout;
     if (isPlaying) {
       interval = setInterval(() => {
-        setCurrentTime((prevTime) => {
-          if (prevTime >= parseInt(currentTrack?.duration || "0")) {
-            clearInterval(interval);
-            handleTrackEnd();
-            return 0;
-          }
-          return prevTime + 1;
-        });
+        dispatch(updateCurrentTime(currentTime + 1));
+        if (currentTime >= parseInt(currentTrack?.duration || "0") - 1) {
+          clearInterval(interval);
+          handleTrackEnd();
+        }
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack, isPlaying, currentTime]);
 
   const handleTrackEnd = () => {
     if (repeatMode === "track") {
-      setCurrentTime(0);
+      dispatch(updateCurrentTime(0));
       dispatch(togglePlay());
     } else {
       dispatch(nextTrack());
@@ -88,7 +92,7 @@ const PlayerScreen: React.FC = () => {
   };
 
   const handleSeek = (time: number) => {
-    setCurrentTime(time);
+    updateCurrentTime(time);
   };
 
   const handleArtistPress = () => {
@@ -120,6 +124,16 @@ const PlayerScreen: React.FC = () => {
   const isFavorite = currentTrack
     ? favorites.some((track) => track.id === currentTrack.id)
     : false;
+
+  const handlePrevPress = () => {
+    dispatch(prevTrack());
+    dispatch(updateCurrentTime(0));
+  };
+
+  const handleNextPress = () => {
+    dispatch(nextTrack());
+    dispatch(updateCurrentTime(0));
+  };
 
   if (!currentTrack) {
     return (
@@ -219,7 +233,7 @@ const PlayerScreen: React.FC = () => {
               color={isShuffled ? "#1DB954" : "#b3b3b3"}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => dispatch(prevTrack())}>
+          <TouchableOpacity onPress={() => handlePrevPress()}>
             <Ionicons name="play-skip-back" size={32} color="white" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => dispatch(togglePlay())}>
@@ -229,7 +243,7 @@ const PlayerScreen: React.FC = () => {
               color="white"
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => dispatch(nextTrack())}>
+          <TouchableOpacity onPress={() => handleNextPress()}>
             <Ionicons name="play-skip-forward" size={32} color="white" />
           </TouchableOpacity>
           <TouchableOpacity

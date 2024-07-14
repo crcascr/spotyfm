@@ -20,6 +20,7 @@ import {
   setQueue,
   toggleFavorite,
   togglePlay,
+  updateCurrentTime,
 } from "../redux/playerSlice";
 import MiniPlayer from "../components/MiniPlayer";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -115,6 +116,7 @@ const HomeScreen: React.FC = () => {
       duration: track.duration,
     };
     dispatch(setCurrentTrack(formattedTrack));
+    dispatch(updateCurrentTime(0));
     if (!isPlaying) dispatch(togglePlay());
 
     const trackIndex = topTracks.findIndex(

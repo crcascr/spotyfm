@@ -79,7 +79,7 @@ const ProfileScreen: React.FC = () => {
   return (
     <View className="flex-1 bg-black">
       <LinearGradient
-        colors={[getRandomColor(), "#000000"]}
+        colors={["#1ED760", "#000000"]}
         className="pb-14 pt-20 px-6 "
       >
         <TouchableOpacity
