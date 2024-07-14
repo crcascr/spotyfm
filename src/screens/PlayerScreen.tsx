@@ -1,5 +1,4 @@
 import React, {
-  useState,
   useEffect,
   useRef,
   useMemo,
@@ -10,8 +9,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Dimensions,
-  FlatList,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -67,6 +64,7 @@ const PlayerScreen: React.FC = () => {
     currentTime,
   } = useSelector((state: RootState) => state.player);
 
+  // Update current time every second
   useEffect(() => {
     loadFavorites();
     let interval: NodeJS.Timeout;
@@ -82,6 +80,7 @@ const PlayerScreen: React.FC = () => {
     return () => clearInterval(interval);
   }, [currentTrack, isPlaying, currentTime]);
 
+  // Handle track end
   const handleTrackEnd = () => {
     if (repeatMode === "track") {
       dispatch(updateCurrentTime(0));
@@ -91,10 +90,12 @@ const PlayerScreen: React.FC = () => {
     }
   };
 
+  // Handle seek
   const handleSeek = (time: number) => {
     updateCurrentTime(time);
   };
 
+  // Handle artist press
   const handleArtistPress = () => {
     if (currentTrack) {
       navigation.navigate("Details", { artist: currentTrack.artist });
@@ -125,6 +126,7 @@ const PlayerScreen: React.FC = () => {
     ? favorites.some((track) => track.id === currentTrack.id)
     : false;
 
+  // Previous and next track handlers
   const handlePrevPress = () => {
     dispatch(prevTrack());
     dispatch(updateCurrentTime(0));
@@ -155,38 +157,7 @@ const PlayerScreen: React.FC = () => {
   const handleSheetChanges = useCallback((index: number) => {
     //console.log("handleSheetChanges",index);
   }, []);
-
-  // Render queue item
-  const renderQueueItem = ({ item }: { item: Track }) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          dispatch(setCurrentTrack(item));
-          bottomSheetRef.current?.close();
-        }}
-        className={`flex-row items-center p-4 border-b border-gray-800 ${
-          currentTrack && currentTrack.name === item.name ? "bg-gray-900" : ""
-        }`}
-      >
-        <Image
-          source={{ uri: item.image }}
-          className="w-12 h-12 rounded mr-4"
-        />
-        <View className="flex-1">
-          <Text
-            className={` font-bold ${
-              currentTrack && currentTrack.name === item.name
-                ? "text-green-500"
-                : "text-white"
-            }`}
-          >
-            {item.name}
-          </Text>
-          <Text className="text-gray-300">{item.artist}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  
 
   return (
     <LinearGradient colors={["#1ed760", "#000000"]} className="p-10 flex-1">

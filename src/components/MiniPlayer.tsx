@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,8 +16,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
     (state: RootState) => state.player
   );
 
-  //const [currentTime, setCurrentTime] = React.useState(0);
-
+  // Update current time every second
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlaying) {
@@ -32,6 +31,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
     return () => clearInterval(interval);
   }, [currentTrack, isPlaying, currentTime]);
 
+  // Handle track end
   const handleTrackEnd = () => {
     if (repeatMode === "track") {
       dispatch(updateCurrentTime(0));
@@ -41,6 +41,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
     }
   };
 
+  // Handle seek
   const handleSeek = (time: number) => {
     dispatch(updateCurrentTime(time));
   };

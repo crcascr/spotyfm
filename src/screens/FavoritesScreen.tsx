@@ -44,15 +44,18 @@ const FavoritesScreen: React.FC<Props> = ({ route, navigation }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["25%", "50%"], []);
 
+  // Handle press track from favorites
   const handlePlayTrack = (track: Track) => {
     dispatch(setQueue(favorites))
     dispatch(setCurrentTrack(track));
   };
 
+  // Handle toggle favorite icon
   const handleToggleFavorite = (track: Track) => {
     dispatch(toggleFavorite(track));
   };
 
+  // Handle miniplayer press
   const handlePlayerPress = () => {
     navigation.navigate("Player");
   };
@@ -63,6 +66,7 @@ const FavoritesScreen: React.FC<Props> = ({ route, navigation }) => {
     bottomSheetRef.current?.expand();
   };
 
+  // Go to details handler
   const handleGoToDetails = () => {
     if (selectedTrack) {
       navigation.navigate("Details", { artist: selectedTrack.artist });

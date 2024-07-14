@@ -2,7 +2,6 @@ import axios from "axios";
 import { API_KEY, BASE_URL } from "../config/api";
 
 // Get top tracks service start
-
 interface Track {
   name: string;
   artist: {
@@ -40,7 +39,6 @@ export const getTopTracks = async (country: string): Promise<Track[]> => {
 // Get top tracks service end
 
 // Get artist info service start
-
 interface ArtistInfo {
   name: string;
   image: Array<{
@@ -82,3 +80,5 @@ export const getArtistInfo = async (artist: string): Promise<ArtistInfo> => {
     throw error;
   }
 };
+
+// Get artist info service end

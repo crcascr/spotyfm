@@ -9,7 +9,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import MiniPlayer from "../components/MiniPlayer";
-import { getRandomColor } from "../utils/helpers";
 import { setRecentTracks } from "../redux/playerSlice";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -34,6 +33,8 @@ const ProfileScreen: React.FC = () => {
     loadRecentTracks();
   }, []);
 
+
+  // Load recent tracks from AsyncStorage
   const loadRecentTracks = async () => {
     try {
       const storedTracks = await AsyncStorage.getItem("recentTracks");
@@ -45,6 +46,7 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
+  // Handle player press
   const handlePlayerPress = () => {
     navigation.navigate("Player");
   };

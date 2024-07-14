@@ -5,7 +5,14 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { getTopTracks } from "../services/lastfm";
@@ -60,6 +67,7 @@ interface Track {
 const HomeScreen: React.FC = () => {
   const [topTracks, setTopTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<HomeSreenNavigationProp>();
   const dispatch = useDispatch();
   const { currentTrack, favorites } = useSelector(
@@ -67,7 +75,7 @@ const HomeScreen: React.FC = () => {
   );
   const isPlaying = useSelector((state: RootState) => state.player.isPlaying);
 
-  // Bottom sheet
+  // Bottom sheet config
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["25%", "50%"], []);
@@ -80,13 +88,24 @@ const HomeScreen: React.FC = () => {
     fetchTopTracks();
   }, []);
 
+  // Fetch top tracks from Last.fm
   const fetchTopTracks = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const tracks = await getTopTracks("colombia");
+      if (tracks.length === 0) {
+        throw new Error("No tracks fetched");
+      }
       setTopTracks(tracks);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching top tracks:", error);
+      setError("Error fetching top tracks. Please try again later.");
+      Alert.alert(
+        "Error",
+        "Failed to fetch top tracks. Please check your internet connection and try again."
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -164,6 +183,7 @@ const HomeScreen: React.FC = () => {
     bottomSheetRef.current?.expand();
   };
 
+  // Go to details handler
   const handleGoToDetails = () => {
     if (selectedTrack) {
       navigation.navigate("Details", { artist: selectedTrack.artist.name });
@@ -224,16 +244,32 @@ const HomeScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
+  // Handle miniplayer press
   const handlePlayerPress = () => {
     navigation.navigate("Player");
   };
 
+  // Handle favorite icon press
   const handleFavoritesPress = () => {
     navigation.navigate("Favorites");
   };
 
   if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-black">
+        <Text className="text-white text-lg mb-4">{error}</Text>
+        <TouchableOpacity
+          className="bg-[#1ED760] px-4 py-2 rounded"
+          onPress={fetchTopTracks}
+        >
+          <Text className="text-white font-bold">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   return (

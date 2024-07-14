@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "spotyfm",
-    "slug": "spotyfm",
+    "name": "Spoty.fm",
+    "slug": "SpotyFm",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,10 +18,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.crcascr.SpotyFm",
+      "permissions":["INTERNET"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c54121ad-6276-4d09-8a50-6b6920d4ee37"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c54121ad-6276-4d09-8a50-6b6920d4ee37"
     }
   }
 }

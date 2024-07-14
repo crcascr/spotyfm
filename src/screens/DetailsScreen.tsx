@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  ActivityIndicator,
   Image,
   TouchableOpacity,
 } from "react-native";
@@ -38,6 +37,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     (state: RootState) => state.player.currentTrack
   );
 
+  // Fetch artist information
   useEffect(() => {
     const fetchArtistInfo = async () => {
       try {
@@ -59,6 +59,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
+  // Handle miniplayer press
   const handlePlayerPress = () => {
     navigation.navigate("Player");
   };
@@ -73,6 +74,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
+  // Constants from HTML artist info
   const{ text, link, linkText}=parseHTML(artistInfo.bio.summary);
 
   return (

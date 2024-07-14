@@ -11,6 +11,7 @@ interface Track {
 
 const DEFAULT_DURATION = "180";
 
+// Validate track duration 
 const validateTrack = (track: Track): Track => {
   if (parseInt(track.duration) <= 0) {
     return { ...track, duration: DEFAULT_DURATION };
@@ -40,6 +41,7 @@ const initialState: PlayerState = {
   currentTime: 0,
 };
 
+// Save to AsyncStorage
 const saveToAsyncStorage = async (key: string, value: any) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
@@ -158,6 +160,7 @@ export const playerSlice = createSlice({
   },
 });
 
+// Add track to recent tracks
 const addToRecentTracks = (state: PlayerState, track: Track) => {
   const validatedTrack = validateTrack(track);
   const index = state.recentTracks.findIndex((t) => t.id === validatedTrack.id);

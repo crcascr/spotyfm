@@ -17,10 +17,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 }) => {
   const [progress, setProgress] = useState(0);
 
+  // Update progress bar value
   useEffect(() => {
     setProgress(currentTime / duration);
   }, [currentTime, duration]);
 
+  // Format time
   const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
